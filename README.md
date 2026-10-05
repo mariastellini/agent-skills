@@ -8,21 +8,21 @@ Skills I've written for coding agents (Claude Code, Codex) and use in my own wor
 
 Adds an update loop to one skill, so that when a run of that skill goes wrong or gets corrected, the skill's own instructions change and the mistake doesn't repeat.
 
-Anyone can tell an agent to edit its own skill. The trouble comes later: entries pile up, one-off corrections turn into universal rules, one person's taste gets baked into a shared skill, and edits land with no review. This skill exists to stop that. The guardrails are the point:
+Skills that edit themselves tend to accumulate entries, turn one-off corrections into rules, and absorb one person's taste. Anyone can tell an agent to edit its own skill; this skill adds guardrails so that doesn't rot it over time:
 
-- **Lessons are scoped to their evidence.** Each entry states its condition ("In repos with a `pnpm-lock.yaml`, use pnpm"). A later matching case in a new context widens the entry instead of adding a sibling.
-- **Wrong entries are deleted.** A run that proves an entry wrong removes it. No counter-entries, no caveats.
-- **Only real signals trigger an edit.** A user correction, a failed step whose retry succeeded, a guess the user confirmed or rejected, or a stated preference about the output. A clean run reports `Skill updates: none`.
-- **SKILL.md has a line budget.** The larger of 1.5 times its size at setup and 100 lines. Past that, entries are merged or detail moves into a supporting file.
-- **Personal taste stays out.** Preferences about the task's output go into the skill. General taste (terseness, emojis, explanation depth) does not. The reply points you at your own `CLAUDE.md` or `AGENTS.md`.
-- **Nothing is committed or published.** The loop only edits files, and never changes the skill's purpose, trigger, or safeguards on risky or outward-facing actions. It proposes those changes instead.
+- Lessons are scoped to their evidence. Each entry states its condition ("In repos with a `pnpm-lock.yaml`, use pnpm"). A later matching case in a new context widens the entry instead of adding a sibling.
+- Wrong entries are deleted. A run that proves an entry wrong removes it. No counter-entries, no caveats.
+- Only real signals trigger an edit: a user correction, a failed step whose retry succeeded, a guess the user confirmed or rejected, or a stated preference about the output. A clean run reports `Skill updates: none`.
+- SKILL.md has a line budget: the larger of 1.5 times its size at setup and 100 lines. The "Updating this skill" section doesn't count toward it. Past the budget, entries are merged or detail moves into a supporting file.
+- Personal taste stays out. Preferences about the task's output go into the skill. General taste (terseness, emojis, explanation depth) does not. The reply points you at your own `CLAUDE.md` or `AGENTS.md`.
+- Nothing is committed or published. The loop only edits files, never changes the skill's purpose, trigger, or safeguards on risky or outward-facing actions, and only proposes changes to the skill's original instructions.
 
 #### Two review modes
 
 You pick one at setup, and can switch later by editing one word.
 
-- **proposals** (the default, also used when you don't answer or no one is there to ask): the diff appears in the reply and is applied only after you approve.
-- **automatic**: the skill edits its own files and reports each edit as one `Skill updated:` line naming the file and the change.
+- `proposals` (the default, also used when you don't answer or no one is there to ask): the diff appears in the reply and is applied only after you approve. If nobody can approve, the diff is reported and dropped.
+- `automatic`: the skill edits its own files and reports each edit as one `Skill updated:` line naming the file and the change.
 
 #### What setup adds to a target
 
@@ -39,7 +39,9 @@ Run this after every run. Change the skill only when one of these signals happen
 
 | Lesson is about | Goes in |
 | --- | --- |
-| (one row per supporting file the skill already has) | |
+
+A row is added here when a supporting file is created. (Setup: write this sentence only if the
+skill has no supporting files, otherwise add one row per file. Delete it once any row exists.)
 
 Rules:
 - Write each lesson at the narrowest scope the evidence supports, with its condition in the entry.
